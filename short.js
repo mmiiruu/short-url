@@ -3,9 +3,8 @@ import fetch from "node-fetch";
 const app = express();
 
 // ตั้งค่าข้อมูล LINE และ Bitly
-const LINE_ACCESS_TOKEN =
-  "OTAJq5xasYN0mMcidGWcar8HahCXwCF1n32yzlwFYh0O365djfX2iTFNbYZpf57M11rg81Jf6YA4AsVwK3vQJwYw6Zwpl7LtQilbZZT5o5H6WaektA7L45bJTgvQPzu2f1iAa09ijnc2BjERT2wZpwdB04t89/1O/w1cDnyilFU=";
-const BITLY_ACCESS_TOKEN = "6cac72ea6c129b9824ec46098b380932e45cae0a";
+const LINE_ACCESS_TOKEN = process.env.LINE_ACCESS_TOKEN;
+const BITLY_ACCESS_TOKEN = process.env.BITLY_ACCESS_TOKEN;
 
 app.use(express.json());
 
