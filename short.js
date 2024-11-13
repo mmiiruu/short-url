@@ -2,20 +2,19 @@ import express from "express";
 import fetch from "node-fetch";
 const app = express();
 
-// ตั้งค่าข้อมูล LINE และ Bitly
 const LINE_ACCESS_TOKEN = process.env.LINE_ACCESS_TOKEN;
 const BITLY_ACCESS_TOKEN = process.env.BITLY_ACCESS_TOKEN;
 
 app.use(express.json());
 
-// ฟังก์ชันดึง URL จากข้อความ
+
 function extractUrl(string) {
   const urlPattern = /(https?:\/\/[^\s]+)/g;
   const urls = string.match(urlPattern);
-  return urls ? urls[0] : null; // คืนค่า URL แรกที่เจอ
+  return urls ? urls[0] : null;
 }
 
-// ฟังก์ชันย่อลิงก์ด้วย Bitly API
+
 async function shortenWithBitly(longUrl) {
   const response = await fetch("https://api-ssl.bitly.com/v4/shorten", {
     method: "POST",
@@ -33,7 +32,6 @@ async function shortenWithBitly(longUrl) {
   }
 }
 
-// ฟังก์ชันส่งข้อความตอบกลับผู้ใช้ทาง LINE API
 async function replyToUser(replyToken, message) {
   await fetch("https://api.line.me/v2/bot/message/reply", {
     method: "POST",
@@ -47,8 +45,6 @@ async function replyToUser(replyToken, message) {
     }),
   });
 }
-
-// Webhook ที่รับข้อความจากผู้ใช้
 app.post("/webhook", async (req, res) => {
   const events = req.body.events;
   for (let event of events) {
@@ -56,19 +52,16 @@ app.post("/webhook", async (req, res) => {
       const userMessage = event.message.text;
       const replyToken = event.replyToken;
 
-      // ดึง URL จากข้อความผู้ใช้
       const url = extractUrl(userMessage);
 
       if (url) {
         try {
-          // ย่อ URL ด้วย Bitly และตอบกลับผู้ใช้
           const shortUrl = await shortenWithBitly(url);
           await replyToUser(replyToken, `ลิงก์สั้นของคุณคือ: ${shortUrl}`);
         } catch (error) {
           await replyToUser(replyToken, "ขออภัย เกิดข้อผิดพลาดในการย่อลิงก์");
         }
       } else {
-        // ตอบกลับหากไม่พบ URL ในข้อความ
         await replyToUser(replyToken, "กรุณาส่ง URL ที่ต้องการย่อมาให้บอท");
       }
     }
